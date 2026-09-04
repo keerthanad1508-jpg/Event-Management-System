@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#040806] text-slate-100 dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventOrbit - SHA-256 Public Certificate Verification</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Poppins & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            dark: { 950: '#040806', 900: '#0a140e', 800: '#122419' },
+            neon: { blue: '#00ff88', purple: '#10b981', pink: '#34d399' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-panel {
+      background: rgba(10, 20, 14, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 136, 0.12);
+    }
+    .gradient-bg-neon {
+      background: linear-gradient(135deg, #00ff88 0%, #10b981 50%, #059669 100%);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-[#040806] text-slate-100 justify-between py-8 px-4">
+
+  <!-- Header -->
+  <header class="max-w-3xl mx-auto w-full flex items-center justify-between border-b border-emerald-500/20 pb-6">
+    <div class="flex items-center gap-3.5">
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-lime-400 flex items-center justify-center text-black shadow-[0_0_25px_rgba(0,255,136,0.35)]">
+        <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="4 2" />
+          <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" />
+          <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <span class="text-xl font-black font-display text-white">Event<span class="text-emerald-400">Orbit</span></span>
+        <span class="block text-[8.5px] text-emerald-400 uppercase font-black tracking-widest">SHA-256 Public Verification Node</span>
+      </div>
+    </div>
+    <span class="text-xs text-slate-500 font-mono">Status: Verified Inspector</span>
+  </header>
+
+  <!-- Main Card Container -->
+  <main class="max-w-2xl mx-auto w-full my-auto py-8">
+    <div id="loading-state" class="text-center py-12 glass-panel rounded-3xl border border-white/10 space-y-4">
+      <i class="fa-solid fa-circle-notch fa-spin text-neon-blue text-4xl"></i>
+      <p class="text-xs text-slate-400 font-mono animate-pulse">Querying database node & verifying SHA-256 cryptographic signature...</p>
+    </div>
+
+    <!-- Verified State Container -->
+    <div id="verified-state" class="hidden glass-panel rounded-3xl p-8 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.15)] space-y-6 relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"></div>
+      
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-2xl shadow-lg">
+            <i class="fa-solid fa-shield-check"></i>
+          </div>
+          <div>
+            <span class="text-xs uppercase font-extrabold tracking-widest text-emerald-400 block">AUTHENTIC & VERIFIED</span>
+            <h2 class="text-lg font-bold text-white font-display">Official Certificate of Achievement</h2>
+          </div>
+        </div>
+        <span id="cert-id-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/5 border border-white/10 text-neon-blue">#CERT-ES-0</span>
+      </div>
+
+      <div class="space-y-4 text-xs font-mono">
+        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-3">
+          <div>
+            <span class="text-[9px] text-slate-500 uppercase block">Issued To Delegate</span>
+            <span id="cert-attendee-name" class="text-base font-bold text-white font-sans">Attendee Name</span>
+            <span id="cert-attendee-email" class="text-xs text-slate-400 block font-mono">email@college.edu</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-3">
+            <div>
+              <span class="text-[9px] text-slate-500 uppercase block">Event Title</span>
+              <span id="cert-event-title" class="font-bold text-slate-200">Event Title</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-500 uppercase block">Category / Track</span>
+              <span id="cert-category" class="font-bold text-neon-blue">Category</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-500 uppercase block">Event Date</span>
+              <span id="cert-event-date" class="font-bold text-slate-300">Date</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-500 uppercase block">Issuing Organization</span>
+              <span id="cert-organizer" class="font-bold text-slate-300">Organizer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SHA-256 Hash Box -->
+        <div class="bg-dark-950 p-4 rounded-2xl border border-white/10 space-y-1.5">
+          <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">SHA-256 Cryptographic Hash Signature</span>
+          <span id="cert-hash-signature" class="block text-[10px] text-emerald-400 break-all font-mono">0000000000000000000000000000000000000000000000000000000000000000</span>
+          <span id="cert-issued-date" class="text-[9px] text-slate-500 block">Issued at: Date</span>
+        </div>
+      </div>
+
+      <div class="flex justify-center pt-2">
+        <a href="/" class="gradient-bg-neon text-white py-2.5 px-6 rounded-xl font-bold text-xs shadow-lg hover:opacity-90 transition-opacity">
+          Return to EventSphere Portal
+        </a>
+      </div>
+    </div>
+
+    <!-- Invalid State Container -->
+    <div id="invalid-state" class="hidden glass-panel rounded-3xl p-8 border border-neon-pink/30 shadow-[0_0_50px_rgba(255,0,122,0.15)] space-y-6 text-center">
+      <div class="w-16 h-16 rounded-full bg-neon-pink/20 text-neon-pink border border-neon-pink/40 flex items-center justify-center text-3xl mx-auto">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-extrabold text-white font-display">Certificate Verification Failed</h2>
+        <p id="invalid-message" class="text-slate-400 text-xs mt-2 max-w-md mx-auto leading-relaxed">
+          The requested certificate hash signature or ID could not be validated against official EventSphere relational database records.
+        </p>
+      </div>
+      <a href="/" class="inline-block bg-white/5 border border-white/10 text-white py-2.5 px-6 rounded-xl font-semibold text-xs hover:bg-white/10 transition-colors">
+        Return to Portal
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-3xl mx-auto w-full text-center border-t border-white/10 pt-6 text-[10px] text-slate-600">
+    EventSphere Public Verification Node • Cryptographic Tamper-Proof Signature System
+  </footer>
+
+  <script>
+    async function verifyCertificate() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const certId = urlParams.get('certId') || urlParams.get('bookingId');
+      const hash = urlParams.get('hash') || certId || '1';
+
+      try {
+        const response = await fetch(`/api/certificates/verify/${encodeURIComponent(hash)}`);
+        const data = await response.json();
+
+        document.getElementById('loading-state').classList.add('hidden');
+
+        if (!response.ok || !data.verified) {
+          document.getElementById('invalid-message').textContent = data.error || 'Invalid or unverified certificate reference.';
+          document.getElementById('invalid-state').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('cert-id-badge').textContent = `#${data.certId}`;
+        document.getElementById('cert-attendee-name').textContent = data.attendeeName;
+        document.getElementById('cert-attendee-email').textContent = data.attendeeEmail;
+        document.getElementById('cert-event-title').textContent = data.eventTitle;
+        document.getElementById('cert-category').textContent = (data.category || 'Academic').toUpperCase();
+        document.getElementById('cert-event-date').textContent = new Date(data.eventDate).toLocaleDateString();
+        document.getElementById('cert-organizer').textContent = data.organizerName;
+        document.getElementById('cert-hash-signature').textContent = data.certHash;
+        document.getElementById('cert-issued-date').textContent = `Issued: ${new Date(data.issuedAt).toLocaleString()}`;
+
+        document.getElementById('verified-state').classList.remove('hidden');
+
+      } catch (err) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('invalid-message').textContent = 'Server connection error during verification.';
+        document.getElementById('invalid-state').classList.remove('hidden');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', verifyCertificate);
+  </script>
+</body>
+</html>

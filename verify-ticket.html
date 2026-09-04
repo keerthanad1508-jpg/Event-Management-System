@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#040806] text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Verification Node - EventOrbit</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Poppins & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              950: '#040806',
+              900: '#0a140e',
+              800: '#122419',
+              700: '#1b3625',
+            },
+            neon: {
+              blue: '#00ff88',
+              purple: '#10b981',
+              pink: '#34d399',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Glassmorphism Styling */
+    .glass-panel {
+      background: rgba(10, 20, 14, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 136, 0.12);
+    }
+    
+    .neon-glow-blue {
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+    }
+    
+    .neon-text-blue {
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    .neon-text-pink {
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    }
+    
+    .gradient-bg-neon {
+      background: linear-gradient(135deg, #00ff88 0%, #10b981 50%, #059669 100%);
+    }
+
+    /* Checkmark / Error animation circles */
+    .status-circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin: 0 auto;
+      animation: scaleUp 0.4s ease-in-out forwards;
+    }
+    
+    @keyframes scaleUp {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-x-hidden selection:bg-emerald-500 selection:text-black bg-[#040806] text-slate-300 relative">
+
+  <!-- Particle Background Layer -->
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute w-[300px] h-[300px] rounded-full bg-emerald-500/10 blur-[80px] -top-32 -left-32"></div>
+    <div class="absolute w-[400px] h-[400px] rounded-full bg-teal-500/10 blur-[100px] -bottom-32 -right-32"></div>
+  </div>
+
+  <div class="flex-grow z-10 flex flex-col items-center justify-center p-4">
+    <!-- Main Card Container -->
+    <div class="w-full max-w-md glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-emerald-500/20 space-y-6">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-lime-400 flex items-center justify-center text-black shadow-[0_0_20px_rgba(0,255,136,0.35)]">
+          <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="4 2" />
+            <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" />
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+          </svg>
+        </div>
+        <span class="text-2xl font-black font-display tracking-tight text-white">Event<span class="text-emerald-400">Orbit</span></span>
+      </div>
+
+      <!-- Spinner / Loader View -->
+      <div id="loader-state" class="text-center py-12 space-y-4">
+        <i class="fa-solid fa-circle-notch fa-spin text-emerald-400 text-4xl"></i>
+        <p class="text-xs text-slate-400 font-mono">Accessing DBMS verification node...</p>
+      </div>
+
+      <!-- Error State (Ticket Not Found) -->
+      <div id="error-state" class="hidden text-center py-8 space-y-6">
+        <div class="status-circle bg-rose-500/10 border border-rose-500/20 text-rose-400">
+          <i class="fa-solid fa-xmark text-4xl"></i>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-2xl font-black text-white font-display uppercase tracking-wider text-rose-400">Access Denied</h2>
+          <p id="error-message" class="text-slate-400 text-xs px-4">Ticket reference code is invalid or does not exist.</p>
+        </div>
+      </div>
+
+      <!-- Success / Ticket Detail View -->
+      <div id="success-state" class="hidden space-y-6">
+        
+        <!-- Booking Verification Title -->
+        <div class="text-center space-y-4">
+          <div id="verified-icon" class="status-circle bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <i class="fa-solid fa-check text-4xl"></i>
+          </div>
+          <div id="cancelled-icon" class="hidden status-circle bg-rose-500/10 border border-rose-500/20 text-rose-400">
+            <i class="fa-solid fa-ban text-4xl"></i>
+          </div>
+          <div class="space-y-1">
+            <h2 id="verification-heading" class="text-2xl font-black text-white font-display uppercase tracking-wider text-emerald-400">TICKET VERIFIED</h2>
+            <span id="booking-code" class="block font-mono text-[10px] text-slate-400 font-semibold tracking-wider">#B-5</span>
+          </div>
+        </div>
+
+        <!-- Verification Metrics Info Box -->
+        <div class="bg-black/40 rounded-2xl border border-white/5 p-5 space-y-4">
+          <!-- User Info -->
+          <div class="border-b border-white/5 pb-3">
+            <span class="block text-[9px] uppercase tracking-wider font-bold text-slate-500 mb-1">Attendee Information</span>
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-sm font-black">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <h4 id="attendee-name" class="text-sm font-bold text-white">Attendee Name</h4>
+                <p id="attendee-email" class="text-[10px] text-slate-400 font-mono">attendee@college.edu</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Info -->
+          <div class="space-y-3">
+            <span class="block text-[9px] uppercase tracking-wider font-bold text-slate-500">Event Details</span>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Title:</span>
+                <span id="event-title" class="font-bold text-white max-w-[200px] text-right">Event Title</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Category:</span>
+                <span id="event-category" class="font-semibold text-emerald-400">Technology</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Venue:</span>
+                <span id="event-venue" class="text-slate-300 font-light">Seminar Hall A</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Schedule:</span>
+                <span id="event-schedule" class="text-slate-300 font-light">Date at Time</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Price Status:</span>
+                <span id="event-price" class="font-bold text-emerald-400">Free Entry</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SQL Auditing Query log -->
+        <div class="space-y-2">
+          <span class="block text-[9px] uppercase tracking-wider font-black text-slate-500"><i class="fa-solid fa-database text-emerald-400"></i> Relational DBMS Log</span>
+          <pre class="bg-black/60 border border-emerald-500/20 p-3 rounded-xl font-mono text-[9px] text-emerald-400 leading-relaxed overflow-x-auto">SELECT B.BookingID, B.Status, E.Title, U.Name
+FROM Bookings B
+INNER JOIN Events E ON B.EventID = E.EventID
+INNER JOIN Users U ON B.UserID = U.UserID
+WHERE B.BookingID = <span id="sql-ref-id" class="text-white font-bold">5</span>;</pre>
+        </div>
+      </div>
+      
+      <!-- Back Link -->
+      <div class="text-center pt-2">
+        <a href="/" class="text-xs font-semibold text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-arrow-left-long mr-1"></i> Back to Main Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Footer -->
+  <footer class="shrink-0 border-t border-white/5 py-6 text-center text-[10px] text-slate-500 bg-[#040806]/60 z-10 w-full mt-auto">
+    <p class="font-light">EventOrbit SQL Ticketing Node • ACID Compliant Gate</p>
+  </footer>
+
+  <script>
+    function formatTimeTo12Hour(timeStr) {
+      if (!timeStr) return '';
+      const parts = timeStr.split(':');
+      let hours = parseInt(parts[0]);
+      const minutes = parts[1] || '00';
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+    }
+
+    async function verifyTicket() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingId = urlParams.get('bookingId');
+      
+      const loader = document.getElementById('loader-state');
+      const errorState = document.getElementById('error-state');
+      const successState = document.getElementById('success-state');
+
+      if (!bookingId) {
+        loader.classList.add('hidden');
+        errorState.classList.remove('hidden');
+        document.getElementById('error-message').textContent = "Booking ID is missing in URL parameters. Please scan a valid ticket QR code.";
+        return;
+      }
+
+      document.getElementById('sql-ref-id').textContent = bookingId;
+
+      try {
+        const response = await fetch(`/api/bookings/verify/${bookingId}`);
+        const data = await response.json();
+
+        loader.classList.add('hidden');
+
+        if (!response.ok) {
+          errorState.classList.remove('hidden');
+          document.getElementById('error-message').textContent = data.error || "Verification failed.";
+          return;
+        }
+
+        // Show Success details
+        successState.classList.remove('hidden');
+        document.getElementById('booking-code').textContent = `#TICKET-REF-${data.BookingID}`;
+        document.getElementById('attendee-name').textContent = data.AttendeeName;
+        document.getElementById('attendee-email').textContent = data.AttendeeEmail;
+        document.getElementById('event-title').textContent = data.EventTitle;
+        document.getElementById('event-category').textContent = data.Category || 'Academic';
+        document.getElementById('event-venue').textContent = data.Venue;
+        
+        // Format Date
+        const dateObj = new Date(data.EventDate);
+        const formattedDate = dateObj.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
+        document.getElementById('event-schedule').textContent = `${formattedDate} at ${formatTimeTo12Hour(data.EventTime)}`;
+        
+        // Format Price
+        const priceVal = parseFloat(data.Price);
+        document.getElementById('event-price').textContent = priceVal === 0 ? 'Free Entry' : `₹${priceVal.toFixed(2)}`;
+
+        // Verify Status
+        const heading = document.getElementById('verification-heading');
+        const verIcon = document.getElementById('verified-icon');
+        const canIcon = document.getElementById('cancelled-icon');
+
+        if (data.BookingStatus === 'Confirmed') {
+          heading.textContent = 'Ticket Verified & Confirmed';
+          heading.className = "text-xl font-black text-emerald-400 font-display uppercase tracking-wider";
+          verIcon.classList.remove('hidden');
+          canIcon.classList.add('hidden');
+        } else {
+          heading.textContent = 'Ticket Reference Cancelled';
+          heading.className = "text-xl font-black text-rose-400 font-display uppercase tracking-wider";
+          verIcon.classList.add('hidden');
+          canIcon.classList.remove('hidden');
+        }
+
+      } catch (err) {
+        loader.classList.add('hidden');
+        errorState.classList.remove('hidden');
+        document.getElementById('error-message').textContent = "Failed to communicate with ticket verification node. Check server connection.";
+      }
+    }
+
+    window.onload = verifyTicket;
+  </script>
+</body>
+</html>

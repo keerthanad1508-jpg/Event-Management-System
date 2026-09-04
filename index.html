@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#040806] text-slate-100 selection:bg-emerald-500 selection:text-black">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventOrbit - Campus Intelligence Platform</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Poppins & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js for Interactive Data Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- QRCode.js for ticket generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              950: '#040806',
+              900: '#0a140e',
+              800: '#122419',
+              700: '#1b3625',
+              600: '#264a34',
+            },
+            neon: {
+              blue: '#00ff88',
+              indigo: '#10b981',
+              purple: '#059669',
+              pink: '#34d399',
+              rose: '#10b981',
+              emerald: '#00ff88',
+              amber: '#84cc16'
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 14s linear infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'shimmer': 'shimmer 2.5s infinite linear',
+            'glow': 'glow 3s ease-in-out infinite alternate',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes glow {
+      0% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+      100% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.4); }
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.995); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .float-anim {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .page-transition {
+      animation: pageIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Matrix Emerald & Jet Black Glassmorphism Cards */
+    .glass-panel {
+      background: rgba(10, 20, 14, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 136, 0.12);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .glass-panel-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-panel-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 255, 136, 0.4);
+      box-shadow: 0 20px 40px -15px rgba(0, 255, 136, 0.25), 0 0 25px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Button Press Micro-interaction Feedback */
+    button, a {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    button:active, a:active {
+      transform: scale(0.98);
+    }
+    
+    /* Neon Emerald Text Glowing */
+    .neon-text-blue {
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+    }
+    .neon-text-purple {
+      text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+    }
+    
+    .gradient-bg-neon {
+      background: linear-gradient(135deg, #00ff88 0%, #10b981 50%, #059669 100%);
+    }
+    
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #040806;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #122419;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00ff88;
+    }
+    
+    /* Sidebar Navigation Links */
+    .sidebar-link-active {
+      background: linear-gradient(90deg, rgba(0, 255, 136, 0.18) 0%, rgba(16, 185, 129, 0.04) 100%);
+      border-left: 3.5px solid #00ff88;
+      color: #00ff88;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+    }
+    
+    /* Form Controls & Smooth Focus Rings */
+    input, select, textarea {
+      background-color: rgba(4, 8, 6, 0.85) !important;
+      border: 1px solid rgba(0, 255, 136, 0.18) !important;
+      color: #ffffff !important;
+      transition: all 0.2s ease !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #00ff88 !important;
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.25) !important;
+      outline: none !important;
+    }
+
+    /* Accessibility: Respect Reduced Motion Preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-x-hidden selection:bg-emerald-500 selection:text-black bg-[#040806] text-slate-300 transition-colors duration-300">
+
+  <!-- Particle Background Layer -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[120px] -top-96 -left-96 animate-pulse-slow"></div>
+    <div class="absolute w-[600px] h-[600px] rounded-full bg-teal-500/10 blur-[150px] -bottom-96 -right-96 animate-pulse-slow"></div>
+    <div class="absolute w-[400px] h-[400px] rounded-full bg-lime-500/5 blur-[120px] top-1/2 left-1/3 animate-float"></div>
+  </div>
+
+  <!-- ==========================================
+      CINEMATIC DASHBOARD INTRO ANIMATION SCREEN
+      ========================================== -->
+  <div id="intro-splash-screen" class="fixed inset-0 z-50 bg-[#040806] flex flex-col items-center justify-center transition-all duration-700 space-y-8 select-none">
+    <div class="relative flex flex-col items-center">
+      <!-- Ambient Backlight Pulsing Orbs -->
+      <div class="absolute w-72 h-72 rounded-full bg-emerald-500/20 blur-[90px] animate-pulse-slow"></div>
+      <div class="absolute w-72 h-72 rounded-full bg-teal-500/20 blur-[100px] animate-pulse-slow delay-1000"></div>
+
+      <!-- Animated Glowing Orbital Logo Mark -->
+      <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-lime-400 flex items-center justify-center text-black shadow-[0_0_50px_rgba(0,255,136,0.6)] animate-float mb-6 relative border border-emerald-400/40">
+        <svg class="w-14 h-14 text-black animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="4 2" />
+          <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" />
+          <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+        </svg>
+      </div>
+
+      <!-- Brand Typography -->
+      <div class="text-center space-y-2">
+        <h1 class="text-4xl sm:text-5xl font-black font-display tracking-tight text-white">
+          Event<span class="text-emerald-400 neon-text-blue">Orbit</span>
+        </h1>
+        <p class="text-xs font-mono text-emerald-400 tracking-[0.3em] uppercase font-black">
+          CAMPUS INTELLIGENCE PLATFORM
+        </p>
+      </div>
+    </div>
+
+    <!-- Animated Loading Progress Bar -->
+    <div class="w-72 space-y-2">
+      <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-emerald-500/30 p-0.5 shadow-inner">
+        <div id="intro-progress-bar" class="h-full gradient-bg-neon rounded-full transition-all duration-300 w-0 shadow-[0_0_15px_rgba(0,255,136,0.8)]"></div>
+      </div>
+      <div class="flex items-center justify-between text-[10px] font-mono">
+        <span id="intro-status-text" class="text-emerald-400">Initializing Engine...</span>
+        <span id="intro-percent-text" class="font-bold text-emerald-300">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+        GLOBAL HEADER
+  ========================================== -->
+  <header id="global-header" class="shrink-0 border-b border-emerald-500/10 bg-[#040806]/90 backdrop-blur-xl sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- New Custom Logo -->
+        <a href="#" onclick="navigateTo('landing')" class="flex items-center gap-3.5 group">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-lime-400 flex items-center justify-center text-black shadow-[0_0_25px_rgba(0,255,136,0.35)] group-hover:scale-105 transition-transform duration-300">
+            <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="4 2" />
+              <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" />
+              <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <span class="text-2xl font-black font-display tracking-tight text-white group-hover:text-emerald-400 transition-colors">Event<span class="text-emerald-400">Orbit</span></span>
+            <span class="block text-[8.5px] text-emerald-400 tracking-[0.25em] uppercase font-extrabold -mt-0.5">CAMPUS INTELLIGENCE PLATFORM</span>
+          </div>
+        </a>
+
+        <!-- Main Landing Links -->
+        <nav id="landing-nav-links" class="hidden md:flex items-center gap-8 text-sm font-semibold">
+          <a href="#hero-section" class="text-neon-blue hover:text-white transition-colors">Home</a>
+          <a href="#trending-section" class="text-slate-400 hover:text-white transition-colors">Trending</a>
+          <a href="#about-section" class="text-slate-400 hover:text-white transition-colors">About</a>
+          <a href="#contact-section" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+        </nav>
+
+        <!-- Session Status Controls -->
+        <div class="flex items-center gap-4">
+          <!-- Notification Bell (Hidden on landing logged out) -->
+          <div id="nav-notification-container" class="hidden relative">
+            <button id="nav-notification-btn" onclick="toggleNotificationDropdown()" class="p-2.5 rounded-lg border border-white/5 bg-white/5 text-slate-400 hover:text-white transition-all shadow-inner relative">
+              <i class="fa-solid fa-bell text-lg"></i>
+              <span id="notification-badge" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-neon-pink text-white rounded-full flex items-center justify-center text-[9px] font-black border border-dark-950 dark:border-dark-950 animate-pulse">0</span>
+            </button>
+            <!-- Dropdown Menu -->
+            <div id="notification-dropdown" class="hidden absolute right-0 mt-3 w-80 glass-panel rounded-2xl p-4 shadow-2xl border border-white/10 z-50 text-xs space-y-3">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <span class="font-bold text-white dark:text-white uppercase tracking-wider text-[10px]">Alert Center</span>
+                <button onclick="markNotificationsRead()" class="text-neon-blue hover:text-white transition-colors font-bold text-[10px]">Mark all as read</button>
+              </div>
+              <div id="notification-list" class="max-h-60 overflow-y-auto space-y-2.5 divide-y divide-white/5">
+                <div class="text-slate-500 text-center py-4">No notifications found.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Light/Dark Toggle -->
+          <button id="theme-toggle" class="p-2.5 rounded-lg border border-white/5 bg-white/5 text-slate-400 hover:text-white transition-all shadow-inner">
+            <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
+          </button>
+
+          <!-- User Stats Badge (Hidden on landing logged out - Clickable to open Profile & Skills) -->
+          <div id="nav-user-badge" onclick="openStudentProfileModal()" class="hidden flex items-center gap-3 bg-white/5 border border-white/5 pl-3 pr-4 py-1.5 rounded-full cursor-pointer hover:bg-white/10 transition-all" title="Click to view & edit Student Credentials, Skills & Interests">
+            <span class="w-2.5 h-2.5 rounded-full bg-neon-blue animate-ping"></span>
+            <span id="nav-user-name" class="text-xs font-semibold text-slate-300">Guest</span>
+            <span id="nav-user-role" class="text-[9px] font-black uppercase bg-neon-purple/20 text-neon-purple border border-neon-purple/30 px-2 py-0.5 rounded-md">Attendee</span>
+          </div>
+
+          <button id="nav-logout-btn" class="hidden flex items-center gap-2 text-sm text-slate-400 hover:text-neon-pink font-semibold py-2 px-3 rounded-lg hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+    PAGE 1: LANDING PAGE VIEW
+    ========================================== -->
+  <div id="view-landing" class="z-10 flex flex-col page-transition">
+    <!-- Hero Section -->
+    <section id="hero-section" class="relative min-h-[75vh] flex items-center py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+      <div class="space-y-8 w-full">
+        <h1 class="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white leading-tight">
+          Schedule, Book & <br class="hidden sm:inline">Explore <span class="gradient-text bg-gradient-to-r from-emerald-400 via-teal-400 to-lime-400 text-transparent bg-clip-text">Campus Events</span>
+        </h1>
+        <p class="text-slate-400 text-base sm:text-lg max-w-2xl leading-relaxed font-light">
+          Designed for students and faculty. Fully responsive single-page architecture built with zero ORM overhead using atomic raw SQL transactions and joins.
+        </p>
+
+        <!-- Countdown Timer Widget -->
+        <div class="glass-panel p-5 rounded-2xl border border-emerald-500/20 max-w-md shadow-2xl relative overflow-hidden flex gap-4 items-center">
+          <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl"></div>
+          <div class="w-12 h-12 rounded-xl gradient-bg-neon flex items-center justify-center text-black text-xl shadow-lg shrink-0 float-anim">
+            <i class="fa-solid fa-hourglass-half"></i>
+          </div>
+          <div class="flex-grow">
+            <span class="block text-[10px] text-emerald-400 uppercase tracking-widest font-black">Next Major Event T-Minus</span>
+            <div id="countdown-timer" class="text-2xl font-black text-white font-mono mt-0.5 tracking-wider">
+              00d : 00h : 00m : 00s
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <button onclick="navigateTo('auth')" class="gradient-bg-neon text-black py-3.5 px-8 rounded-xl font-bold tracking-wide shadow-[0_0_30px_rgba(0,255,136,0.3)] hover:opacity-90 hover:-translate-y-0.5 transition-all">
+            Launch Portal <i class="fa-solid fa-circle-chevron-right ml-2"></i>
+          </button>
+          <a href="#trending-section" class="bg-white/5 border border-white/10 text-slate-300 py-3.5 px-8 rounded-xl font-bold hover:bg-white/10 hover:text-white transition-all hover:-translate-y-0.5">
+            Explore Catalog
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trending Events Section -->
+    <section id="trending-section" class="py-24 bg-dark-900/40 border-t border-white/5 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-12">
+        <div class="text-center max-w-xl mx-auto space-y-3">
+          <h2 class="text-4xl font-extrabold tracking-tight text-white font-display">Featured <span class="gradient-text bg-gradient-to-r from-neon-blue to-neon-purple text-transparent bg-clip-text">Trending Events</span></h2>
+          <p class="text-slate-400">Discover top-rated educational, cultural, and sports programs happening this week.</p>
+        </div>
+
+        <!-- Trending Carousel Frame -->
+        <div class="relative overflow-hidden px-4 py-8">
+          <!-- Slide Container -->
+          <div id="trending-carousel" class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory">
+            <!-- Dynamically populated carousel cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Module Section -->
+    <section id="about-section" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <!-- Interactive Gallery Grid -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="glass-panel p-4 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div class="h-32 bg-gradient-to-br from-neon-blue/20 to-transparent rounded-lg mb-3 flex items-center justify-center text-neon-blue text-4xl group-hover:scale-105 transition-transform duration-300">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            <h4 class="font-bold text-white mb-1">Raw DDL Schema</h4>
+            <p class="text-slate-400 text-xs leading-relaxed">Structured users, bookings, and events with cascading integrity constraints.</p>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden group mt-6">
+            <div class="h-32 bg-gradient-to-br from-neon-purple/20 to-transparent rounded-lg mb-3 flex items-center justify-center text-neon-purple text-4xl group-hover:scale-105 transition-transform duration-300">
+              <i class="fa-solid fa-database"></i>
+            </div>
+            <h4 class="font-bold text-white mb-1">Row Locking</h4>
+            <p class="text-slate-400 text-xs leading-relaxed">Guarantees zero ticket loss during concurrent peak booking events.</p>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div class="h-32 bg-gradient-to-br from-neon-pink/20 to-transparent rounded-lg mb-3 flex items-center justify-center text-neon-pink text-4xl group-hover:scale-105 transition-transform duration-300">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h4 class="font-bold text-white mb-1">Advanced Joins</h4>
+            <p class="text-slate-400 text-xs leading-relaxed">Aggregates registrations and queries counts using GROUP BY statistics.</p>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden group mt-6">
+            <div class="h-32 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-lg mb-3 flex items-center justify-center text-emerald-400 text-4xl group-hover:scale-105 transition-transform duration-300">
+              <i class="fa-solid fa-reply-all"></i>
+            </div>
+            <h4 class="font-bold text-white mb-1">Unified Adapter</h4>
+            <p class="text-slate-400 text-xs leading-relaxed">Transparently runs on either MySQL or local SQLite databases depending on port status.</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="inline-flex items-center gap-2 bg-neon-blue/10 border border-neon-blue/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-neon-blue tracking-wide">
+            <i class="fa-solid fa-circle-question"></i> ARCHITECTURAL SPECIFICATIONS
+          </div>
+          <h2 class="text-4xl font-extrabold tracking-tight text-white font-display">Why We Built EventOrbit</h2>
+          <p class="text-slate-400 leading-relaxed font-light">
+            Every college DBMS mini-project needs to satisfy strict evaluation guidelines. We built EventOrbit specifically to demonstrate professional relational database concepts in a modern startup-grade web interface.
+          </p>
+          <ul class="space-y-4 text-sm font-semibold text-slate-300">
+            <li class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-neon-blue/20 text-neon-blue flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+              <span>Compulsory Raw Relational Schema (No ORM libraries)</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+              <span>Atomicity of Bookings using Transactions</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+              <span>Inner Join and Group By Query outputs shown explicitly</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Feedback Form -->
+    <section id="contact-section" class="py-24 bg-dark-900/40 border-t border-white/5">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-12">
+        <div class="text-center max-w-xl mx-auto space-y-3">
+          <h2 class="text-4xl font-extrabold tracking-tight text-white font-display">Get in <span class="gradient-text bg-gradient-to-r from-neon-purple to-neon-pink text-transparent bg-clip-text">Touch / Feedback</span></h2>
+          <p class="text-slate-400">Questions about the project setup or have comments for database evaluation?</p>
+        </div>
+
+        <form id="feedback-form" class="glass-panel p-8 rounded-2xl border border-white/5 space-y-6 relative overflow-hidden shadow-2xl">
+          <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-neon-pink/15 rounded-full blur-2xl"></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Full Name</label>
+              <input type="text" id="feedback-name" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="Judge / Examiner Name">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Affiliation</label>
+              <input type="text" id="feedback-college" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="e.g. CS Department">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Project Rating</label>
+            <div class="flex gap-3 text-2xl text-slate-600">
+              <button type="button" onclick="setRating(1)" class="rating-star hover:text-amber-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+              <button type="button" onclick="setRating(2)" class="rating-star hover:text-amber-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+              <button type="button" onclick="setRating(3)" class="rating-star hover:text-amber-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+              <button type="button" onclick="setRating(4)" class="rating-star hover:text-amber-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+              <button type="button" onclick="setRating(5)" class="rating-star hover:text-amber-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+            </div>
+            <input type="hidden" id="feedback-rating" value="5">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Evaluation Comments</label>
+            <textarea id="feedback-comments" required rows="4" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="Write feedback details..."></textarea>
+          </div>
+          <button type="submit" class="gradient-bg-neon text-white w-full py-3.5 rounded-xl font-bold tracking-wide shadow-lg hover:opacity-95 transition-opacity">
+            Submit Evaluation Report <i class="fa-solid fa-paper-plane ml-2"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========================================= PAGE 2: AUTHENTICATION CONTAINER (LOGIN/REGISTER)
+  ========================================== -->
+  <div id="view-auth" class="hidden flex-grow flex items-center justify-center py-12 px-4 page-transition">
+    <div class="w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl relative overflow-hidden border border-white/5">
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-neon-blue/15 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-neon-pink/15 rounded-full blur-3xl"></div>
+      
+      <div class="text-center mb-8 relative">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-600 to-fuchsia-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(0,240,255,0.4)] mx-auto mb-4 float-anim">
+          <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="4 2" />
+            <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" />
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+          </svg>
+        </div>
+        <h2 class="text-3xl font-extrabold text-white tracking-tight font-display">System Authentication</h2>
+        <p class="text-slate-400 text-xs mt-2">Relational database user session generator</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex bg-white/5 p-1 rounded-xl mb-6 border border-white/5">
+        <button id="auth-tab-login" onclick="toggleAuthTab('login')" class="w-1/2 py-2.5 text-xs font-bold rounded-lg text-white bg-[#0d0d26] border border-white/5 shadow transition-all">
+          Sign In
+        </button>
+        <button id="auth-tab-register" onclick="toggleAuthTab('register')" class="w-1/2 py-2.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition-all">
+          Create Identity
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="auth-login-form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Database Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="email" id="auth-login-email" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="alice@college.edu">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="password" id="auth-login-password" required autocomplete="current-password" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('auth-login-password', 'login-pass-eye')" class="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 p-1">
+              <i class="fa-solid fa-eye" id="login-pass-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="w-full gradient-bg-neon text-white py-3.5 rounded-xl font-bold tracking-wide shadow-lg hover:shadow-neon-blue/20">
+          Authorize Session <i class="fa-solid fa-key ml-2"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="auth-register-form" class="space-y-5 hidden">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Name</label>
+          <div class="relative">
+            <i class="fa-solid fa-id-card absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="text" id="auth-reg-name" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="Your Name">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Database Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="email" id="auth-reg-email" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="name@college.edu">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="password" id="auth-reg-password" required autocomplete="new-password" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('auth-reg-password', 'reg-pass-eye')" class="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 p-1">
+              <i class="fa-solid fa-eye" id="reg-pass-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Role Entity</label>
+          <div class="relative">
+            <i class="fa-solid fa-users-gear absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <select id="auth-reg-role" onchange="handleRoleFieldChange()" required class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors appearance-none">
+              <option value="Attendee">Attendee (Student)</option>
+              <option value="Organizer">Organizer (Club Lead/Faculty)</option>
+              <option value="Admin">System Administrator</option>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-4 top-4.5 text-slate-500 pointer-events-none"></i>
+          </div>
+        </div>
+        <div>
+          <label id="lbl-reg-usn" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Student USN / Roll No</label>
+          <div class="relative">
+            <i id="icon-reg-usn" class="fa-solid fa-graduation-cap absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="text" id="auth-reg-usn" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="1MS21CS042">
+          </div>
+        </div>
+        <div>
+          <label id="lbl-reg-dept" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Department / Branch</label>
+          <div class="relative">
+            <i id="icon-reg-dept" class="fa-solid fa-building-columns absolute left-4 top-4 text-slate-500 pointer-events-none"></i>
+            <input type="text" id="auth-reg-dept" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white text-sm focus:border-neon-blue focus:outline-none transition-colors" placeholder="Computer Science & Engineering">
+          </div>
+        </div>
+        <button type="submit" class="w-full gradient-bg-neon text-white py-3.5 rounded-xl font-bold tracking-wide shadow-lg hover:shadow-neon-blue/20">
+          Create Identity <i class="fa-solid fa-user-plus ml-2"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+  PAGE 3: WORKSPACE PANEL LAYOUT (DASHBOARD FRAME)
+      ========================================== -->
+  <div id="view-workspace" class="hidden flex-grow flex relative page-transition">
+    <!-- Sidebar Navigation -->
+    <aside class="shrink-0 w-64 bg-dark-950 border-r border-white/5 flex flex-col justify-between hidden md:flex z-20">
+      <div class="py-6 space-y-6">
+        <span class="block px-6 text-[10px] font-black uppercase text-neon-blue tracking-widest">NAVIGATION NODE</span>
+        <nav class="space-y-1.5 px-3">
+          <button onclick="switchTab('dashboard')" id="side-link-dashboard" class="sidebar-link-active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-gauge-high w-5 text-center"></i> Dashboard
+          </button>
+          <button onclick="switchTab('explore')" id="side-link-explore" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-compass w-5 text-center"></i> Explore Events
+          </button>
+          <button onclick="switchTab('calendar')" id="side-link-calendar" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-calendar-days w-5 text-center"></i> Calendar View
+          </button>
+          <button onclick="switchTab('bookings')" id="side-link-bookings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-ticket w-5 text-center"></i> My Bookings
+          </button>
+          <button onclick="openStudentProfileModal()" id="side-link-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 transition-all">
+            <i class="fa-solid fa-id-card w-5 text-center"></i> My Profile & Skills
+          </button>
+          
+          <!-- Organizer Module controls (Hidden dynamically for Attendee) -->
+          <button onclick="switchTab('organizer')" id="side-link-organizer" class="hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-folder-open w-5 text-center"></i> Manage Events
+          </button>
+          
+          <!-- Admin Panel controls (Hidden dynamically for non-Admins) -->
+          <button onclick="switchTab('admin')" id="side-link-admin" class="hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <i class="fa-solid fa-shield-halved w-5 text-center"></i> Admin Panel
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footprint -->
+      <div class="p-6 border-t border-white/5 text-center">
+        <span class="block text-[10px] text-slate-600 font-mono">SQLite-Connected</span>
+        <span class="block text-[8px] text-emerald-500 font-bold uppercase tracking-wider mt-0.5">DB STATUS: ALIVE</span>
+      </div>
+    </aside>
+
+    <!-- Content Stage -->
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full space-y-8 z-10">
+
+      <!-- ==========================================
+          NODE 3.1: WORKSPACE DASHBOARD SUB-VIEW
+          ========================================== -->
+      <div id="sub-view-dashboard" class="space-y-8 page-transition">
+        <div>
+          <h2 id="dash-title" class="text-3xl font-extrabold text-white font-display">Workspace Analytics</h2>
+          <p id="dash-subtitle" class="text-slate-400 mt-1">Real-time monitoring node aggregating database operations.</p>
+        </div>
+
+        <!-- Metrics cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="glass-panel p-5 rounded-2xl border border-white/5 flex items-center gap-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-20 h-20 bg-neon-blue/10 rounded-full blur-xl"></div>
+            <div class="w-12 h-12 rounded-xl bg-neon-blue/10 flex items-center justify-center text-neon-blue text-xl shadow-lg shrink-0">
+              <i class="fa-solid fa-shapes"></i>
+            </div>
+            <div>
+              <span id="lbl-dash-stat-1" class="block text-[10px] text-slate-500 uppercase tracking-widest font-black">Total Events</span>
+              <span id="dash-stat-events" class="text-2xl font-black text-white">0</span>
+            </div>
+          </div>
+          <div class="glass-panel p-5 rounded-2xl border border-white/5 flex items-center gap-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-20 h-20 bg-neon-purple/10 rounded-full blur-xl"></div>
+            <div class="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center text-neon-purple text-xl shadow-lg shrink-0">
+              <i class="fa-solid fa-ticket-simple"></i>
+            </div>
+            <div>
+              <span id="lbl-dash-stat-2" class="block text-[10px] text-slate-500 uppercase tracking-widest font-black">Bookings Made</span>
+              <span id="dash-stat-bookings" class="text-2xl font-black text-white font-mono">0</span>
+            </div>
+          </div>
+          <div class="glass-panel p-5 rounded-2xl border border-white/5 flex items-center gap-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-20 h-20 bg-neon-pink/10 rounded-full blur-xl"></div>
+            <div class="w-12 h-12 rounded-xl bg-neon-pink/10 flex items-center justify-center text-neon-pink text-xl shadow-lg shrink-0">
+              <i class="fa-solid fa-chart-bar"></i>
+            </div>
+            <div>
+              <span id="lbl-dash-stat-3" class="block text-[10px] text-slate-500 uppercase tracking-widest font-black">Est. Sales Volume</span>
+              <span id="dash-stat-revenue" class="text-2xl font-black text-white font-mono">₹0.00</span>
+            </div>
+          </div>
+          <div class="glass-panel p-5 rounded-2xl border border-white/5 flex items-center gap-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl shadow-lg shrink-0">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <span id="lbl-dash-stat-4" class="block text-[10px] text-slate-500 uppercase tracking-widest font-black">Total Members</span>
+              <span id="dash-stat-members" class="text-2xl font-black text-white font-mono">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytical Visualization Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="glass-panel rounded-2xl p-6 border border-white/5 lg:col-span-2 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 font-display">
+              <i class="fa-solid fa-chart-line text-neon-blue"></i> Registration Analytics
+            </h3>
+            <div class="h-64 relative flex items-center justify-center">
+              <canvas id="dashboard-chart-registrations"></canvas>
+            </div>
+          </div>
+          <div class="glass-panel rounded-2xl p-6 border border-white/5 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 font-display">
+              <i class="fa-solid fa-pie-chart text-neon-purple"></i> Role Allocation
+            </h3>
+            <div class="h-64 relative flex items-center justify-center">
+              <canvas id="dashboard-chart-roles"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports & Analytics Table (Visible to Admin/Organizer) -->
+        <div id="dash-reports-container" class="hidden glass-panel rounded-2xl p-6 border border-white/5 space-y-4">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2 font-display">
+            <i class="fa-solid fa-chart-line text-neon-blue"></i> Event Performance & Revenue Report
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-white/5 text-slate-300 font-bold uppercase tracking-wider border-b border-white/5">
+                  <th class="p-3">Event ID</th>
+                  <th class="p-3">Event Title</th>
+                  <th class="p-3 text-right">Price</th>
+                  <th class="p-3 text-center">Registrations</th>
+                  <th class="p-3 text-center">Capacity</th>
+                  <th class="p-3 text-right">Total Revenue</th>
+                </tr>
+              </thead>
+              <tbody id="dash-reports-rows" class="divide-y divide-white/5 font-mono text-slate-400">
+                <!-- Dynamically populated report rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/5 space-y-4">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2 font-display">
+            <i class="fa-solid fa-clock-rotate-left text-neon-pink"></i> Recent Operations Logging (Auditing Feed)
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-white/5 text-slate-300 font-bold uppercase tracking-wider border-b border-white/5">
+                  <th class="p-3">Log Time</th>
+                  <th class="p-3">Entity Type</th>
+                  <th class="p-3">Description</th>
+                  <th class="p-3">SQL Query Operation Reference</th>
+                </tr>
+              </thead>
+              <tbody id="dash-activity-rows" class="divide-y divide-white/5 font-mono text-slate-400">
+                <!-- Dynamically populated auditing log lines -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+          NODE 3.2: EXPLORE EVENTS VIEW
+          ========================================== -->
+      <div id="sub-view-explore" class="hidden space-y-8 page-transition">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-3xl font-extrabold text-white font-display">Events Catalog</h2>
+            <p class="text-slate-400 mt-1">Book ticket reservations across active events.</p>
+          </div>
+          
+          <!-- Search / Filters -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+              <input type="text" id="explore-search" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-neon-blue transition-colors" placeholder="Search title or venue...">
+            </div>
+            <select id="explore-category-filter" class="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-neon-blue">
+              <option value="all">All Categories</option>
+              <option value="Technology">Technology</option>
+              <option value="Sports">Sports</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Academic">Academic</option>
+            </select>
+            <select id="explore-price-filter" class="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-neon-blue">
+              <option value="all">All Prices</option>
+              <option value="free">Free Only</option>
+              <option value="paid">Paid Only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Catalog grid -->
+        <div id="explore-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Dynamically populated event cards -->
+        </div>
+        <div id="explore-empty-state" class="hidden text-center py-16 glass-panel rounded-2xl border border-white/5">
+          <i class="fa-solid fa-calendar-xmark text-slate-600 text-5xl mb-4"></i>
+          <p class="text-slate-400">No events matched your search criteria.</p>
+        </div>
+      </div>
+
+      <!-- ==========================================
+          NODE 3.2.B: CALENDAR VIEW
+          ========================================== -->
+      <div id="sub-view-calendar" class="hidden space-y-8 page-transition">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-3xl font-extrabold text-white font-display">Interactive Event Calendar</h2>
+            <p class="text-slate-400 mt-1">Visual schedule of all upcoming campus programs and deadlines.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="prevCalendarMonth()" class="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span id="calendar-month-year" class="text-lg font-bold text-white font-display min-w-[160px] text-center">Month Year</span>
+            <button onclick="nextCalendarMonth()" class="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button onclick="resetCalendarToToday()" class="py-2.5 px-4 rounded-xl border border-neon-blue/30 bg-neon-blue/10 text-neon-blue font-semibold text-xs hover:bg-neon-blue/20 transition-colors">
+              Today
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl">
+          <!-- Calendar Days Header -->
+          <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold uppercase tracking-wider text-slate-400 pb-4 border-b border-white/10">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <!-- Calendar Grid Days -->
+          <div id="calendar-grid" class="grid grid-cols-7 gap-2 pt-4 min-h-[450px]">
+            <!-- Dynamically rendered day cells -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+        NODE 3.3: MY BOOKINGS VIEW
+========================================== -->
+      <div id="sub-view-bookings" class="hidden space-y-8 page-transition">
+        <div>
+          <h2 class="text-3xl font-extrabold text-white font-display">My Booking Terminals</h2>
+          <p class="text-slate-400 mt-1">Displays registered tickets fetched using raw multi-table `INNER JOIN` operations.</p>
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-white/5 border-b border-white/10 text-slate-300 font-bold uppercase tracking-wider text-xs">
+                  <th class="py-4 px-6">Booking Code</th>
+                  <th class="py-4 px-6">Event Details</th>
+                  <th class="py-4 px-6">Organizer Node</th>
+                  <th class="py-4 px-6">Schedule</th>
+                  <th class="py-4 px-6 text-right">Price</th>
+                  <th class="py-4 px-6 text-center">Operation Status</th>
+                  <th class="py-4 px-6 text-center">Terminal Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-rows" class="divide-y divide-white/5">
+                <!-- Dynamically populated bookings list -->
+              </tbody>
+            </table>
+          </div>
+          <div id="bookings-table-empty" class="hidden text-center py-16 text-slate-500">
+            <i class="fa-solid fa-ticket-simple text-4xl mb-3"></i>
+            <p>No bookings found. Head to the Events Catalog to purchase tickets!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+        NODE 3.4: ORGANIZER CRUD MODUL========================================== -->
+      <div id="sub-view-organizer" class="hidden space-y-8 page-transition">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-3xl font-extrabold text-white font-display">Organizer Event Hub</h2>
+            <p class="text-slate-400 mt-1">Perform raw relational `INSERT`, `UPDATE`, and `DELETE` transactions.</p>
+          </div>
+          <button onclick="openCreateModal()" class="gradient-bg-neon text-white py-3 px-6 rounded-xl font-bold text-xs shadow-lg hover:shadow-neon-purple/20 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Create Event Entry
+          </button>
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-white/5 border-b border-white/10 text-slate-300 font-bold uppercase tracking-wider text-xs">
+                  <th class="py-4 px-6">Event ID</th>
+                  <th class="py-4 px-6">Title & Category</th>
+                  <th class="py-4 px-6">Schedule</th>
+                  <th class="py-4 px-6">Location</th>
+                  <th class="py-4 px-6 text-center">Registrations / Cap</th>
+                  <th class="py-4 px-6 text-right">Price</th>
+                  <th class="py-4 px-6 text-center">Status</th>
+                  <th class="py-4 px-6 text-center">Operations</th>
+                </tr>
+              </thead>
+              <tbody id="org-rows" class="divide-y divide-white/5">
+                <!-- Dynamically populated organizer events -->
+              </tbody>
+            </table>
+          </div>
+          <div id="org-table-empty" class="hidden text-center py-16 text-slate-500">
+            <i class="fa-solid fa-circle-exclamation text-4xl mb-3"></i>
+            <p>You have not registered any event entries yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+          NODE 3.5: ADMINISTRATIVE PANEL
+          ========================================== -->
+      <div id="sub-view-admin" class="hidden space-y-8 page-transition">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-3xl font-extrabold text-white font-display">System Administration</h2>
+            <p class="text-slate-400 mt-1">Audit users, check database integrity logs, and export evaluation sheets.</p>
+          </div>
+          <button onclick="exportEvaluationReport()" class="gradient-bg-neon text-white py-3 px-6 rounded-xl font-bold text-xs shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-file-export"></i> Export CSV Report
+          </button>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="glass-panel p-4 rounded-xl border border-white/5 flex flex-wrap gap-4 items-center justify-between">
+          <div class="relative w-full sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+            <input type="text" id="admin-user-search" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-neon-blue" placeholder="Filter user records...">
+          </div>
+          <div class="flex gap-4">
+            <span class="text-xs text-slate-400 font-semibold uppercase">Total Users: <span id="admin-user-count" class="text-white font-bold ml-1">0</span></span>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-white/5 border-b border-white/10 text-slate-300 font-bold uppercase tracking-wider text-xs">
+                  <th class="py-4 px-6">User ID</th>
+                  <th class="py-4 px-6">Name</th>
+                  <th class="py-4 px-6">Email Address</th>
+                  <th class="py-4 px-6 text-center">Allocated Role</th>
+                  <th class="py-4 px-6 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-user-rows" class="divide-y divide-white/5">
+                <!-- Dynamically populated users list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==========================================
+      QR CODE TERMINAL MODAL
+      ========================================== -->
+  <div id="qr-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-sm glass-panel rounded-2xl p-6 shadow-2xl space-y-6 text-center border border-white/10">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <h3 class="text-lg font-bold text-white font-display">Event Access Ticket</h3>
+        <button onclick="closeQrModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="flex justify-center p-4 bg-white rounded-xl shadow-inner max-w-[200px] mx-auto">
+        <div id="qrcode-container"></div>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <span id="qr-ticket-code" class="block font-mono text-neon-blue font-bold tracking-wider">TICKET_CODE</span>
+        <h4 id="qr-event-title" class="text-sm font-extrabold text-white">Event Title</h4>
+        <p id="qr-event-meta" class="text-slate-400 font-light">Event metadata</p>
+      </div>
+
+      <button onclick="closeQrModal()" class="w-full bg-white/5 border border-white/10 text-slate-300 py-2.5 rounded-xl font-bold text-xs hover:bg-white/10 transition-all">
+        Dismiss Terminal
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      CRUD DATA FORM MODAL (ADD / EDIT)
+    ========================================== -->
+  <div id="crud-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-xl glass-panel rounded-3xl p-6 shadow-2xl space-y-5 border border-white/10">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <h3 id="crud-modal-title" class="text-xl font-bold text-white font-display">Configure Event entry</h3>
+        <button onclick="closeCrudModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="crud-event-form" class="space-y-4 text-xs font-semibold">
+        <input type="hidden" id="crud-form-id">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Event Title</label>
+          <input type="text" id="crud-title" required class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="e.g. Artificial Intelligence Workshop">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Category Selection</label>
+          <div class="relative">
+            <select id="crud-category" required class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue appearance-none">
+              <option value="Technology">Technology</option>
+              <option value="Sports">Sports</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Academic">Academic</option>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-4 top-3 text-slate-500 pointer-events-none"></i>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Description</label>
+          <textarea id="crud-description" rows="3" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="Describe the topics and timeline..."></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Date</label>
+            <input type="date" id="crud-date" required class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Time</label>
+            <input type="time" id="crud-time" required class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Venue Location</label>
+          <input type="text" id="crud-venue" required class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="e.g. Seminar Hall B">
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="col-span-2">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Total Capacity (Slots)</label>
+            <input type="number" id="crud-slots" required min="1" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="50">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Price (INR / ₹)</label>
+            <input type="number" id="crud-price" required min="0" step="0.01" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="0.00">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Event Image URL</label>
+          <input type="url" id="crud-image" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="e.g. https://images.unsplash.com/photo-...">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+          <button type="button" onclick="closeCrudModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-5 rounded-lg font-semibold hover:bg-white/10 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="gradient-bg-neon text-white py-2.5 px-6 rounded-lg font-bold">
+            Write Entry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+  PAYMENT TRANSACTION CHECKOUT MODAL
+    ========================================== -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-md glass-panel rounded-3xl p-6 border border-white/10 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <h3 class="text-xl font-bold text-white font-display flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-neon-blue"></i> Secure Gateway Payment
+        </h3>
+        <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Event Summary -->
+      <div class="bg-white/5 p-4 rounded-xl border border-white/5 space-y-1.5">
+        <span class="text-[9px] uppercase tracking-wider font-bold text-slate-500">Checkout Event Summary</span>
+        <h4 id="payment-event-title" class="text-base font-extrabold text-white">Event Title</h4>
+        <div class="flex justify-between text-xs pt-2 border-t border-white/5 text-slate-400">
+          <span>Price per Slot</span>
+          <span id="payment-event-price" class="font-bold text-emerald-400 font-mono">₹0.00</span>
+        </div>
+      </div>
+
+      <!-- Payment Methods Toggle -->
+      <div class="space-y-4 text-xs font-semibold">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Select Method</label>
+          <div class="flex bg-white/5 p-1 rounded-xl border border-white/5">
+            <button onclick="switchPaymentMethod('upi')" id="pay-tab-upi" class="w-1/2 py-2 text-xs font-bold rounded-lg text-white bg-[#0d0d26] border border-white/5 shadow transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-mobile-screen-button text-neon-blue"></i> UPI Checkout
+            </button>
+            <button onclick="switchPaymentMethod('card')" id="pay-tab-card" class="w-1/2 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-credit-card text-neon-purple"></i> Card Checkout
+            </button>
+          </div>
+        </div>
+
+        <!-- UPI form -->
+        <div id="pay-form-upi" class="space-y-4">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Enter Virtual Payment Address (VPA / UPI ID)</label>
+            <input type="text" id="pay-upi-id" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="e.g. attendee@okaxis">
+          </div>
+        </div>
+
+        <!-- Card form -->
+        <div id="pay-form-card" class="space-y-4 hidden">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Cardholder Name</label>
+            <input type="text" id="pay-card-name" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="Your Name">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Card Number</label>
+            <input type="text" id="pay-card-number" maxlength="19" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="4111 2222 3333 4444">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Expiry Date</label>
+              <input type="text" id="pay-card-expiry" maxlength="5" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="MM/YY">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">CVV / Security Code</label>
+              <input type="password" id="pay-card-cvv" maxlength="3" class="w-full bg-[#020205]/60 border border-white/10 rounded-lg py-2.5 px-3.5 text-white focus:outline-none focus:border-neon-blue" placeholder="123">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Spinner and Action buttons -->
+      <div id="pay-status-spinner" class="hidden text-center py-4 space-y-2">
+        <i class="fa-solid fa-spinner fa-spin text-neon-blue text-2xl"></i>
+        <p class="text-[10px] text-slate-400 font-mono animate-pulse">Contacting NPCI Payment Gateway node...</p>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-white/5" id="pay-modal-actions">
+        <button type="button" onclick="closePaymentModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-5 rounded-lg font-semibold hover:bg-white/10 transition-colors text-xs">
+          Cancel
+        </button>
+        <button onclick="submitPaymentTransaction()" id="pay-submit-btn" class="gradient-bg-neon text-white py-2.5 px-6 rounded-lg font-bold text-xs flex items-center gap-2">
+          Authorize Transaction <i class="fa-solid fa-shield-halved"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      ORGANIZER EVENT BOOKINGS REGISTRATIONS MODAL
+      ========================================== -->
+  <!-- ==========================================
+      ORGANIZER EVENT BOOKINGS REGISTRATIONS MODAL
+      ========================================== -->
+  <div id="event-bookings-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-5xl glass-panel rounded-3xl p-6 border border-white/10 space-y-5">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-white font-display">Event Booking Registrations & Check-In Roster</h3>
+          <p id="event-bookings-modal-subtitle" class="text-slate-400 text-xs mt-0.5">Attendee registration, payments, and check-in audit report.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="exportEventBookingsCSV()" class="gradient-bg-neon text-white py-1.5 px-4 rounded-xl font-bold text-xs shadow flex items-center gap-2 hover:opacity-90">
+            <i class="fa-solid fa-file-csv"></i> Export CSV Roster
+          </button>
+          <button onclick="closeEventBookingsModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 max-h-[380px] overflow-y-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-white/5 text-slate-300 font-bold uppercase border-b border-white/10">
+              <th class="p-3">Booking ID</th>
+              <th class="p-3">Attendee Name</th>
+              <th class="p-3">Email Address</th>
+              <th class="p-3">Booking Date</th>
+              <th class="p-3 text-right">Paid Amount</th>
+              <th class="p-3 text-center">Payment Method</th>
+              <th class="p-3">Transaction ID</th>
+              <th class="p-3 text-center">Gate Check-In</th>
+            </tr>
+          </thead>
+          <tbody id="event-bookings-rows" class="divide-y divide-white/5 font-mono text-slate-400">
+            <!-- Dynamically populated attendee booking rows -->
+          </tbody>
+        </table>
+      </div>
+      <div id="event-bookings-empty" class="hidden text-center py-10 text-slate-500">
+        <i class="fa-solid fa-circle-exclamation text-3xl mb-2"></i>
+        <p>No bookings registered for this event yet.</p>
+      </div>
+
+      <div class="flex justify-end pt-4 border-t border-white/5">
+        <button type="button" onclick="closeEventBookingsModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-6 rounded-lg font-semibold hover:bg-white/10 transition-colors text-xs">
+          Dismiss Terminal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      EVENT REVIEWS & RATINGS MODAL
+      ========================================== -->
+  <div id="reviews-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-2xl glass-panel rounded-3xl p-6 border border-white/10 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <div>
+          <h3 id="reviews-modal-title" class="text-xl font-bold text-white font-display">Event Feedback & Reviews</h3>
+          <p id="reviews-modal-subtitle" class="text-slate-400 text-xs mt-0.5">Verified attendee feedback and star ratings</p>
+        </div>
+        <button onclick="closeReviewsModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Rating summary card -->
+      <div class="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/5">
+        <div class="text-center shrink-0">
+          <span id="reviews-avg-rating" class="text-4xl font-black text-neon-blue font-display">0.0</span>
+          <div id="reviews-stars-avg" class="flex gap-1 text-amber-400 text-xs mt-1 justify-center"></div>
+          <span id="reviews-count-badge" class="text-[10px] text-slate-400 font-mono">0 reviews</span>
+        </div>
+        <div class="flex-grow border-l border-white/5 pl-6 text-xs text-slate-400">
+          <p class="font-semibold text-slate-200">Community Sentiment</p>
+          <p class="text-[11px] mt-1">Ratings and feedback are verified directly from database booking records.</p>
+        </div>
+      </div>
+
+      <!-- Write Review Section (for attendees) -->
+      <div id="review-form-container" class="glass-panel p-4 rounded-2xl border border-white/5 space-y-3">
+        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Leave Your Review</h4>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400">Select Rating:</span>
+          <div id="star-rating-selector" class="flex gap-1 text-slate-500 text-lg cursor-pointer">
+            <i class="fa-solid fa-star hover:text-amber-400 transition-colors" data-rating="1" onclick="setRating(1)"></i>
+            <i class="fa-solid fa-star hover:text-amber-400 transition-colors" data-rating="2" onclick="setRating(2)"></i>
+            <i class="fa-solid fa-star hover:text-amber-400 transition-colors" data-rating="3" onclick="setRating(3)"></i>
+            <i class="fa-solid fa-star hover:text-amber-400 transition-colors" data-rating="4" onclick="setRating(4)"></i>
+            <i class="fa-solid fa-star hover:text-amber-400 transition-colors" data-rating="5" onclick="setRating(5)"></i>
+          </div>
+          <span id="rating-number-label" class="text-xs font-bold text-amber-400 ml-2">5 Stars</span>
+        </div>
+        <textarea id="review-comment-input" rows="2" class="w-full bg-[#020205]/60 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-neon-blue" placeholder="Share your experience at this event..."></textarea>
+        <div class="flex justify-end">
+          <button type="button" onclick="submitEventReview()" class="gradient-bg-neon text-white py-2 px-5 rounded-lg text-xs font-bold shadow hover:opacity-90">
+            Submit Review <i class="fa-solid fa-paper-plane ml-1"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reviews Feed List -->
+      <div id="reviews-feed" class="max-h-60 overflow-y-auto space-y-3 divide-y divide-white/5 pr-2">
+        <!-- Dynamically populated reviews -->
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-white/5">
+        <button onclick="closeReviewsModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2 px-5 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      PRINTABLE TICKET PASS MODAL
+      ========================================== -->
+  <div id="print-pass-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/85 backdrop-blur-md transition-opacity">
+    <div class="relative w-full max-w-lg space-y-4">
+      <!-- Pass Card Element (Printed area) -->
+      <div id="printable-pass-card" class="bg-dark-900 border border-white/10 rounded-3xl p-6 shadow-2xl text-white space-y-6 relative overflow-hidden">
+        <div class="absolute -top-20 -right-20 w-40 h-40 bg-neon-blue/15 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-neon-purple/15 rounded-full blur-3xl"></div>
+
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl gradient-bg-neon flex items-center justify-center text-white font-bold text-xl shadow-lg">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div>
+              <span class="text-lg font-black font-display tracking-tight text-white">Event<span class="text-neon-blue">Sphere</span></span>
+              <span class="block text-[9px] text-neon-pink uppercase font-extrabold tracking-widest">OFFICIAL DELEGATE PASS</span>
+            </div>
+          </div>
+          <span id="pass-status-badge" class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">CONFIRMED</span>
+        </div>
+
+        <!-- Event details -->
+        <div class="space-y-2">
+          <span id="pass-category" class="text-[10px] uppercase font-bold text-neon-blue tracking-widest">CATEGORY</span>
+          <h3 id="pass-event-title" class="text-xl font-bold font-display text-white">Event Title</h3>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 text-xs font-mono">
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Attendee Name</span>
+            <span id="pass-attendee-name" class="font-bold text-slate-200">Attendee Name</span>
+          </div>
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Booking Reference</span>
+            <span id="pass-booking-id" class="font-bold text-neon-blue">#0000</span>
+          </div>
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Schedule Date & Time</span>
+            <span id="pass-schedule" class="font-bold text-slate-200">Date @ Time</span>
+          </div>
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Venue Location</span>
+            <span id="pass-venue" class="font-bold text-slate-200">Venue</span>
+          </div>
+        </div>
+
+        <!-- QR Verification Box -->
+        <div class="flex items-center justify-between bg-dark-950 p-4 rounded-2xl border border-white/10">
+          <div>
+            <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Verification QR</span>
+            <span class="block text-[9px] text-slate-500 mt-1 font-mono">Scan at gate for instant check-in</span>
+          </div>
+          <div id="pass-qr-container" class="bg-white p-2 rounded-xl shadow-inner border border-white/20"></div>
+        </div>
+      </div>
+
+      <!-- Action controls -->
+      <div class="flex items-center justify-between">
+        <button onclick="closePrintPassModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-5 rounded-xl font-semibold text-xs hover:bg-white/10 transition-colors">
+          Close Pass
+        </button>
+        <button onclick="printPassCard()" class="gradient-bg-neon text-white py-2.5 px-6 rounded-xl font-bold text-xs shadow-lg hover:shadow-neon-blue/20 flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Print / Download Pass
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      AI TEAMMATE & PARTNER MATCHMAKER MODAL
+      ========================================== -->
+  <div id="matchmaker-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm transition-opacity">
+    <div class="relative w-full max-w-2xl glass-panel rounded-3xl p-6 border border-white/10 space-y-5">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl gradient-bg-neon flex items-center justify-center text-white font-bold text-xl shadow-lg">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+          <div>
+            <h3 id="matchmaker-modal-title" class="text-xl font-bold text-white font-display">AI Teammate & Partner Matchmaker</h3>
+            <p class="text-slate-400 text-xs mt-0.5">Quantum Affinity Matcher based on Jaccard Vector Similarity</p>
+          </div>
+        </div>
+        <button onclick="closeMatchmakerModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Matchmaker info bar -->
+      <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-xs flex items-center gap-3">
+        <i class="fa-solid fa-atom text-neon-blue text-xl shrink-0"></i>
+        <div class="text-slate-300">
+          <span class="font-bold text-white block">Smart Affinity Engine</span>
+          <span class="text-[11px] text-slate-400 leading-relaxed">Matching registered attendees for this event by shared skillsets and complementary team roles.</span>
+        </div>
+      </div>
+
+      <!-- Recommendations List -->
+      <div id="matchmaker-feed" class="max-h-72 overflow-y-auto space-y-3 pr-2">
+        <!-- Dynamically populated match cards -->
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-white/5">
+        <button onclick="closeMatchmakerModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2 px-5 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors">
+          Close Matchmaker
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      CRYPTOGRAPHIC DIGITAL CERTIFICATE MODAL
+      ========================================== -->
+  <div id="certificate-display-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/90 backdrop-blur-md transition-opacity">
+    <div class="relative w-full max-w-2xl space-y-4">
+      <!-- Certificate Visual Document -->
+      <div id="printable-certificate-card" class="bg-dark-900 border-2 border-amber-400/40 rounded-3xl p-8 shadow-[0_0_60px_rgba(251,191,36,0.15)] text-white space-y-6 relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-52 h-52 bg-amber-400/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-52 h-52 bg-neon-purple/10 rounded-full blur-3xl"></div>
+
+        <!-- Certificate Header -->
+        <div class="text-center space-y-2 border-b border-amber-400/20 pb-6 relative">
+          <div class="w-14 h-14 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 text-3xl mx-auto mb-3 shadow-lg">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <span class="text-xs uppercase font-extrabold tracking-widest text-amber-400">OFFICIAL COLLEGE CREDENTIAL</span>
+          <h2 class="text-3xl font-black font-display tracking-tight text-white">Certificate of Achievement</h2>
+          <p class="text-slate-400 text-xs font-light">This is to officially certify the delegate participation and attendance node.</p>
+        </div>
+
+        <!-- Body -->
+        <div class="text-center space-y-4 py-2">
+          <span class="text-xs text-slate-400 uppercase font-mono">This Credential Is Proudly Awarded To</span>
+          <h3 id="cert-display-attendee" class="text-2xl font-black text-neon-blue font-display">Student Name</h3>
+          <p class="text-slate-300 text-xs max-w-md mx-auto leading-relaxed">
+            For successful completion and verified gate check-in at the campus program:
+          </p>
+          <div class="inline-block px-4 py-2 rounded-xl bg-white/5 border border-white/10 font-bold text-white text-sm font-display" id="cert-display-event">
+            Event Title
+          </div>
+        </div>
+
+        <!-- Metadata & Verification Section -->
+        <div class="grid grid-cols-2 gap-4 bg-dark-950 p-4 rounded-2xl border border-white/10 text-xs font-mono">
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Certificate Serial</span>
+            <span id="cert-display-id" class="font-bold text-amber-400">#CERT-ES-0</span>
+          </div>
+          <div>
+            <span class="block text-[9px] text-slate-500 uppercase">Issue Date</span>
+            <span id="cert-display-date" class="font-bold text-slate-300">Date</span>
+          </div>
+          <div class="col-span-2 border-t border-white/5 pt-2">
+            <span class="block text-[9px] text-slate-500 uppercase">SHA-256 Cryptographic Hash Signature</span>
+            <span id="cert-display-hash" class="block text-[9px] text-emerald-400 break-all mt-0.5">0000000000000000000000000000000000000000000000000000000000000000</span>
+          </div>
+        </div>
+
+        <!-- Verification QR Box -->
+        <div class="flex items-center justify-between border-t border-white/10 pt-4">
+          <div>
+            <span class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">Public Verification Node</span>
+            <span class="block text-[9px] text-slate-500 mt-0.5">Scan to verify cryptographic authenticity</span>
+          </div>
+          <div id="cert-qr-container" class="bg-white p-2 rounded-xl shadow-inner border border-white/20"></div>
+        </div>
+      </div>
+
+      <!-- Action controls -->
+      <div class="flex items-center justify-between">
+        <button onclick="closeCertificateModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-5 rounded-xl font-semibold text-xs hover:bg-white/10 transition-colors">
+          Close Document
+        </button>
+        <button onclick="printCertificateDocument()" class="gradient-bg-neon text-white py-2.5 px-6 rounded-xl font-bold text-xs shadow-lg hover:opacity-90 flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Print / Download Certificate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      STUDENT PROFILE & SKILLS DASHBOARD MODAL
+      ========================================== -->
+  <div id="student-profile-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-dark-950/85 backdrop-blur-md transition-opacity">
+    <div class="relative w-full max-w-2xl glass-panel rounded-3xl p-6 border border-white/10 space-y-6">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-white/5 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl gradient-bg-neon flex items-center justify-center text-white font-extrabold text-2xl shadow-lg">
+            <i class="fa-solid fa-id-card"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white font-display">Student Identity & Skill Dashboard</h3>
+            <p class="text-slate-400 text-xs">Official student credentials and interest tag selector</p>
+          </div>
+        </div>
+        <button onclick="closeStudentProfileModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Student Credentials Card -->
+      <div class="bg-dark-900 border border-white/10 p-5 rounded-2xl space-y-4 relative overflow-hidden">
+        <div class="absolute -top-16 -right-16 w-32 h-32 bg-neon-blue/10 rounded-full blur-2xl"></div>
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <span class="text-[9px] font-black uppercase text-neon-blue tracking-widest">OFFICIAL STUDENT CREDENTIALS</span>
+          <span id="profile-role-badge" class="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ATTENDEE</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+          <div>
+            <span class="text-[9px] text-slate-500 uppercase block">Student Name</span>
+            <span id="profile-name" class="font-bold text-white text-sm font-sans">Alice Smith</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 uppercase block">Email Address</span>
+            <span id="profile-email" class="font-bold text-slate-300">alice@college.edu</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 uppercase block">Student USN / Roll No</span>
+            <span id="profile-usn" class="font-bold text-neon-blue font-mono text-sm">1MS21CS042</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-slate-500 uppercase block">Department / Branch</span>
+            <span id="profile-dept" class="font-bold text-slate-300">Computer Science & Engineering</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categorized Skill & Interest Selector -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-sm font-bold text-white font-display">Select Your Skill & Interest Categories</h4>
+          <span class="text-[10px] text-neon-pink font-bold">Updates AI Matchmaker live!</span>
+        </div>
+
+        <!-- Category Groups -->
+        <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+          <!-- 💻 Tech Group -->
+          <div class="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+            <span class="text-[10px] uppercase font-bold text-neon-blue tracking-wider block"><i class="fa-solid fa-code"></i> Technology & Coding</span>
+            <div id="tech-tags-group" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- 🎵 Cultural Group -->
+          <div class="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+            <span class="text-[10px] uppercase font-bold text-neon-purple tracking-wider block"><i class="fa-solid fa-music"></i> Cultural & Music Tastes</span>
+            <div id="cultural-tags-group" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- ⚽ Sports Group -->
+          <div class="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+            <span class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block"><i class="fa-solid fa-futbol"></i> Sports & Fitness</span>
+            <div id="sports-tags-group" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="flex items-center justify-between border-t border-white/5 pt-4">
+        <button onclick="closeStudentProfileModal()" class="bg-white/5 border border-white/10 text-slate-300 py-2.5 px-5 rounded-xl text-xs font-semibold hover:bg-white/10 transition-colors">
+          Cancel
+        </button>
+        <button onclick="saveStudentSkillProfile()" class="gradient-bg-neon text-white py-2.5 px-6 rounded-xl font-bold text-xs shadow-lg hover:opacity-90 flex items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Save Skill Profile
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+BOOKING STATUS ANIMATION OVERLAY
+========================================= -->
+  <div id="booking-confirm-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-950/90 backdrop-blur-md transition-opacity">
+    <div class="text-center space-y-6 max-w-sm">
+      <div class="w-24 h-24 mx-auto flex items-center justify-center">
+        <!-- SVG Checkmark -->
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+      <h3 class="text-2xl font-extrabold text-white font-display neon-text-blue">Booking Confirmed!</h3>
+      <p class="text-slate-400 text-xs leading-relaxed">
+        Your slot has been allocated via an atomic database transaction. You can download the access pass from your bookings node.
+      </p>
+      <button onclick="dismissBookingConfirm()" class="gradient-bg-neon text-white py-2.5 px-6 rounded-xl font-bold text-xs shadow-lg hover:shadow-neon-blue/20">
+        Dismiss Terminal
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+    AI BOT CHAT WIDGET
+========================================== -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end">
+    <!-- Chat Window (Hidden by default) -->
+    <div id="chatbot-window" class="hidden w-80 sm:w-96 h-[450px] glass-panel rounded-2xl flex flex-col shadow-2xl border border-white/10 mb-4 overflow-hidden relative">
+      <div class="absolute -top-16 -right-16 w-32 h-32 bg-neon-purple/10 rounded-full blur-2xl"></div>
+      
+      <!-- Head -->
+      <div class="bg-gradient-to-r from-dark-800 to-dark-900 border-b border-white/5 p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg gradient-bg-neon flex items-center justify-center text-white text-sm animate-pulse">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <span class="block text-xs font-black text-white">EventOrbit Oracle</span>
+            <span class="block text-[8px] text-emerald-400 font-bold uppercase tracking-wider">AI ASSISTANT LOGGED IN</span>
+          </div>
+        </div>
+        <button onclick="toggleChatbot()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- Chat logs -->
+      <div id="chatbot-logs" class="flex-grow p-4 overflow-y-auto space-y-4 text-xs">
+        <div class="flex items-start gap-2.5">
+          <div class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] shrink-0 font-bold">
+            AI
+          </div>
+          <div class="bg-white/5 border border-white/5 p-3 rounded-xl rounded-tl-none text-slate-300 leading-relaxed max-w-[80%]">
+            Greetings! I am the EventOrbit SQL Oracle. Ask me anything about local events, how to register, or request descriptions of database schema structures!
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat input -->
+      <form id="chatbot-form" class="border-t border-white/5 p-3 bg-dark-950 flex gap-2">
+        <input type="text" id="chatbot-input" required class="flex-grow bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-neon-blue" placeholder="Ask about bookings, schema...">
+        <button type="submit" class="gradient-bg-neon text-black p-2 rounded-xl text-xs hover:opacity-90 transition-opacity">
+          <i class="fa-solid fa-paper-plane px-1 py-0.5"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Floating Trigger Icon -->
+    <button onclick="toggleChatbot()" class="w-14 h-14 rounded-full gradient-bg-neon text-black flex items-center justify-center text-xl shadow-[0_0_30px_rgba(0,255,136,0.4)] hover:scale-105 transition-transform duration-300">
+      <i class="fa-solid fa-robot"></i>
+    </button>
+  </div>
+
+  <!-- Toast Notification frame -->
+  <div id="toast-container" class="fixed bottom-5 left-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+  <!-- Global Footer -->
+  <footer class="shrink-0 border-t border-white/5 py-8 text-center text-xs text-slate-500 bg-[#040806] z-10">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="font-light">EventOrbit Database Systems Dashboard • DBMS Evaluation Build</p>
+      <div class="flex gap-4 font-semibold text-slate-500">
+        <a href="#" class="hover:text-white transition-colors">Schema DDL</a>
+        <span class="text-white/10">|</span>
+        <a href="#" class="hover:text-white transition-colors">ACID Transactions</a>
+        <span class="text-white/10">|</span>
+        <a href="#" class="hover:text-white transition-colors">Join Audits</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend logic script integration -->
+  <script src="/app.js?v=2.3"></script>
+</body>
+</html>
